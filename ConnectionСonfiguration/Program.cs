@@ -40,8 +40,8 @@ var config = builder.Build();
 string connectionString = config.GetConnectionString("JsonConnection");
 
 var optionsBuilder_ = new DbContextOptionsBuilder<InDbContextOptionsContext>();
-var options_ = optionsBuilder.UseSqlServer(connectionString).Options;
-using (InDbContextOptionsContext db = new InDbContextOptionsContext(options))
+var options_ = optionsBuilder_.UseSqlServer(connectionString).Options;
+using (InDbContextOptionsContext db = new InDbContextOptionsContext(options_))
 {
     Console.WriteLine("InJsonFileContext_________________");
     var users = db.Users.ToList();
