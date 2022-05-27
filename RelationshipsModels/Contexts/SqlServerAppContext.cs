@@ -11,6 +11,8 @@ namespace RelationshipsModels.Contexts
         public DbSet<User> Users => Set<User>(); //{ get; set; } = null!; //{ get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Position> Positions { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Course> Courses { get; set; }
 
         public SqlServerAppContext(DbContextOptions<SqlServerAppContext> options) : base(options)
         {

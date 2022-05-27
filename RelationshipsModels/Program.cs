@@ -44,6 +44,20 @@ using (SqlServerAppContext db = new SqlServerAppContext(options_SqlServer))
     User kate = new User { Name = "Kate", Company = google, Position = manager };
     db.Users.AddRange(tom, bob, alice, kate);
 
+    UserProfile profile1 = new UserProfile { Info = "Tom", User = tom };
+    UserProfile profile2 = new UserProfile { Info = "Alice", User = bob };
+    db.UserProfiles.AddRange(profile1, profile2);
+
+    Course algorithms = new Course { Name = "Алгоритмы" };
+    Course basics = new Course { Name = "Основы программирования" };
+    db.Courses.AddRange(algorithms, basics);
+
+    // добавляем к студентам курсы
+    tom.Courses.Add(algorithms);
+    tom.Courses.Add(basics);
+    alice.Courses.Add(algorithms);
+    bob.Courses.Add(basics);
+
     db.SaveChanges();
 }
 // получение данных
@@ -114,6 +128,32 @@ Console.WriteLine("----------  Lazy loading (ленивая загрузка) --
         Console.WriteLine();
     }
 
+    //------------------------------ отношения между моделями ---------------------------
+    Console.WriteLine("----------  User - UserProfile (1 - 1) ------------");
+    foreach (User user in db.Users.Include(u => u.Profile).ToList())
+    {
+        Console.WriteLine($"UserInfo: {user.Profile?.Info} Id: {user.Profile?.Id}");
+        Console.WriteLine($"Login: { user.Name} \n");
+    }
+    //
+    Console.WriteLine("----------  User - Position (1 - n) ------------");
+    foreach (User user in db.Users.Include(u => u.Position).ToList())
+    {
+        Console.WriteLine($"UserPosition: {user.Position?.Name} Id: {user.Position?.Id}");
+        Console.WriteLine($"Login: { user.Name} \n");
+    }
+    //
+    Console.WriteLine("----------  User - Position (n - n) ------------");
+    var courses = db.Courses.Include(c => c.Users).ToList();
+    // выводим все курсы
+    foreach (var c in courses)
+    {
+        Console.WriteLine($"Course: {c.Name}");
+        // выводим всех студентов для данного кура
+        foreach (User s in c.Users)
+            Console.WriteLine($"Name: {s.Name}");
+        Console.WriteLine("-------------------");
+    }
 }
 
 

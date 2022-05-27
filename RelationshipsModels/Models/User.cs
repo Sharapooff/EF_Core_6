@@ -23,6 +23,8 @@ namespace RelationshipsModels.Models
 
         public virtual Position Position { get; set; }
         public virtual Company Company { get; set; }    // навигационное свойство
+        public virtual UserProfile Profile { get; set; }
+        public virtual List<Course> Courses { get; set; } = new();
 
         /* Если внешний ключ не допускает значения null и требует наличия конкретного значения
          * - id связанного объекта Company, то устанавливается каскадное удаление записей: ON DELETE CASCADE.
