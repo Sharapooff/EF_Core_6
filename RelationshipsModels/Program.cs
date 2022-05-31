@@ -57,6 +57,8 @@ using (SqlServerAppContext db = new SqlServerAppContext(options_SqlServer))
     tom.Courses.Add(basics);
     alice.Courses.Add(algorithms);
     bob.Courses.Add(basics);
+    //или так
+    //algorithms.Students.AddRange(new List<Student>() { tom, bob });
 
     db.SaveChanges();
 }
@@ -83,77 +85,185 @@ using (SqlServerAppContext db = new SqlServerAppContext(options_SqlServer))
                             .ThenInclude(count => count.Capital)    // к стране добавляем столицу
                     .Include(u => u.Position) // добавляем данные по должностям
                     .ToList();
-    foreach (var user in users)
+    foreach (var useR in users)
     {
-        Console.WriteLine($"{user.Name} - {user.Position.Name}");
-        Console.WriteLine($"{user.Company?.Name} - {user.Company?.Country.Name} - {user.Company?.Country.Capital.Name}");
+        Console.WriteLine($"{useR.Name} - {useR.Position.Name}");
+        Console.WriteLine($"{useR.Company?.Name} - {useR.Company?.Country.Name} - {useR.Company?.Country.Capital.Name}");
         Console.WriteLine("----------------------");
     }
 //---------------------------  Explicit loading (явная загрузка) ---------------------------
 Console.WriteLine("----------  Explicit loading (явная загрузка) ------------");
     //db.Users.Load(); //если все
     Console.WriteLine("---------- Load()");
-    Company company = db.Companies.FirstOrDefault();
-    db.Users.Where(p => p.CompanyId == company.Id).Load();
-    Console.WriteLine($"Company: {company.Name}");
-    foreach (var p in company.Users)
-        Console.WriteLine($"User: {p.Name}");
+    Company? company = db.Companies.FirstOrDefault();
+    if (company != null)
+    {
+        db.Users.Where(u => u.CompanyId == company.Id).Load();
+        Console.WriteLine($"Company: {company.Name}");
+        foreach (var p in company.Users)
+            Console.WriteLine($"User: {p.Name}");
+    }
     //Для загрузки связанных данных мы также можем использовать методы Collection() и Reference.
     //Метод Collection применяется, если навигационное свойство представляет коллекцию.
     Console.WriteLine("---------- Collection()");
     company = db.Companies.FirstOrDefault();
-    db.Entry(company).Collection(t => t.Users).Load();
-    Console.WriteLine($"Company: {company.Name}");
-    foreach (var p in company.Users)
-        Console.WriteLine($"User: {p.Name}");
+    if (company != null)
+    {
+        db.Entry(company).Collection(t => t.Users).Load();
+        Console.WriteLine($"Company: {company.Name}");
+        foreach (var p in company.Users)
+            Console.WriteLine($"User: {p.Name}");
+    }
     //Если навигационное свойство представляет одиночный объект, то можно применять метод Reference:
     Console.WriteLine("---------- Collection() и Reference");
-    User user_ = db.Users.FirstOrDefault();  // получаем первого пользователя
-    db.Entry(user_).Reference(x => x.Company).Load();
-    Console.WriteLine($"{user_.Name} - {user_.Company?.Name}");
-
+    User? user_ = db.Users.FirstOrDefault();  // получаем первого пользователя
+    if (user_ != null)
+    {
+        db.Entry(user_).Reference(x => x.Company).Load();
+        Console.WriteLine($"{user_.Name} - {user_.Company?.Name}");
+    }
 //------------------------------  Lazy loading (ленивая загрузка) ---------------------------
+/* Все навигационные свойства должны быть определены как виртуальные (то есть с модификатором virtual),
+ * при этом сами классы моделей должны быть public.
+ * Добавить в проект через nuget пакет Microsoft.EntityFrameworkCore.Proxiesy.
+ * При конфигурации контекста данных вызвать метод UseLazyLoadingProxies().
+ */
 Console.WriteLine("----------  Lazy loading (ленивая загрузка) ------------");
     var users_ = db.Users.ToList();
-    foreach (User user in users_)
-        Console.WriteLine($"{user.Name} - {user.Company?.Name}");
+    foreach (User usEr in users_)
+        Console.WriteLine($"{usEr.Name} - {usEr.Company?.Name}");
     //---
     Console.WriteLine("");
     var companies = db.Companies.ToList();
     foreach (Company company_ in companies)
     {
         Console.Write($"{company_.Name}:");
-        foreach (User user in company_.Users)
-            Console.Write($"{user.Name} ");
+        foreach (User uSer in company_.Users)
+            Console.Write($"{uSer.Name} ");
         Console.WriteLine();
     }
 
     //------------------------------ отношения между моделями ---------------------------
     Console.WriteLine("----------  User - UserProfile (1 - 1) ------------");
-    foreach (User user in db.Users.Include(u => u.Profile).ToList())
+    /*При удалении надо учитывать следующее: так как объект UserProfile требует наличие объекта User и зависит от этого объекта,
+     * то при удалении связанного объекта User также будет удален и связанный с ним объект UserProfile.
+     * Если же будет удален объект UserProfile, на объект User это никак не повлияет.
+     * создается уникальный индекс. И этот индекс гарантирует, что только одна зависимая сущность (здесь UserProfile) может быть связана
+     * с одной главной сущностью (здесь сущность User)
+     */
+    foreach (User _user in db.Users.Include(u => u.Profile).ToList())
     {
-        Console.WriteLine($"UserInfo: {user.Profile?.Info} Id: {user.Profile?.Id}");
-        Console.WriteLine($"Login: { user.Name} \n");
+        Console.WriteLine($"UserInfo: {_user.Profile?.Info} Id: {_user.Profile?.Id}");
+        Console.WriteLine($"Login: { _user.Name} \n");
     }
     //
     Console.WriteLine("----------  User - Position (1 - n) ------------");
-    foreach (User user in db.Users.Include(u => u.Position).ToList())
+    /*
+     * Одна модель хранит ссылку на один объект другой модели, а вторая модель может ссылаться на коллекцию объектов первой модели.
+     * Если зависимая сущность (в данном случае User) требует обязательного наличия главной сущности (в данном случае Position), 
+     * то на уровне базы данных при удалении главной сущности с помощью каскадного удаления будут удалены и связанные с ней зависимые сущности. 
+     */
+    foreach (User usER in db.Users.Include(u => u.Position).ToList())
     {
-        Console.WriteLine($"UserPosition: {user.Position?.Name} Id: {user.Position?.Id}");
-        Console.WriteLine($"Login: { user.Name} \n");
+        Console.WriteLine($"UserPosition: {usER.Position?.Name} Id: {usER.Position?.Id}");
+        Console.WriteLine($"Login: { usER.Name} \n");
     }
     //
-    Console.WriteLine("----------  User - Position (n - n) ------------");
+    Console.WriteLine("----------  User - Course (n - n) ------------");
+    /*
+     * Однако, при создании базы данных в ней будет три таблицы.
+     * Удаление же студента или курса из базы данных приведет к тому, что все строки из промежуточной таблицы,
+     * которые связаны с удаляемым объектом, также будут удалены
+     */
     var courses = db.Courses.Include(c => c.Users).ToList();
     // выводим все курсы
     foreach (var c in courses)
     {
         Console.WriteLine($"Course: {c.Name}");
-        // выводим всех студентов для данного кура
+        // выводим всех юзеров для данного кура
         foreach (User s in c.Users)
             Console.WriteLine($"Name: {s.Name}");
         Console.WriteLine("-------------------");
     }
+    //редактирование
+    User? alice = db.Users.Include(s => s.Courses).FirstOrDefault(s => s.Name == "Alice");
+    Course? algorithms = db.Courses.FirstOrDefault(c => c.Name == "Алгоритмы");
+    Course? basics = db.Courses.FirstOrDefault(c => c.Name == "Основы программирования");
+    if (alice != null && algorithms != null && basics != null)
+    {
+        // удаление курса у студента
+        alice.Courses.Remove(algorithms);
+        // добавление нового курса студенту
+        alice.Courses.Add(basics);
+        db.SaveChanges();
+    }
+    //удаление
+    User? user = db.Users.FirstOrDefault();
+    if (user != null)
+    {
+        db.Users.Remove(user);
+        db.SaveChanges();
+    }
+
+    /* Так же существуют 
+     * Комплексные типы.------------------------------------------------------------------
+     * Атрибут OwnedAttribute позволяет установить зависимый тип для основного.
+     * По сути одна модель (тип) включаетс в себя другую модель (тип).
+     * Но при создании таблицы, создается одна общая для них таблица.
+     * public class User
+        {
+            public int Id { get; set; }
+            public string? Login { get; set; }
+            public string? Password { get; set; }
+            public UserProfile? Profile { get; set; }
+        }
+        [Owned]
+        public class UserProfile
+        {
+            public string? Name { get; set; }
+            public int Age { get; set; }
+        }
+    // и контекст:
+        public DbSet<User> Users { get; set; } = null!;
+
+    //добавление данных
+        User user1 = new User
+        {
+            Login = "login1",
+            Password = "pass1234",
+            Profile = new UserProfile { Age = 23, Name = "Tom" }
+        };
+        User user2 = new User
+        {
+            Login = "login2",
+            Password = "5678word2",
+            Profile = new UserProfile { Age = 27, Name = "Alice" }
+        };
+        db.Users.AddRange(user1, user2);
+        db.SaveChanges();
+     */
+
+    /*
+     * Иерархические данные.----------------------------------------------------------------
+     * 
+     * public class MenuItem
+        {
+            public int Id { get; set; }
+            public string? Title { get; set; }
+            public int? ParentId { get; set; }
+            public MenuItem? Parent { get; set; }
+            public List<MenuItem> Children { get; set; } = new();
+        }
+    // и контекст:
+      public DbSet<MenuItem> MenuItems { get; set; } = null!;
+        
+    //добавление
+    MenuItem file = new MenuItem { Title = "File" };
+    MenuItem edit = new MenuItem { Title = "Edit" };
+    MenuItem open = new MenuItem { Title = "Open", Parent = file };
+    MenuItem save = new MenuItem { Title = "Save", Parent = file };
+     */
+
 }
 
 
