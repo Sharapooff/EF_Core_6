@@ -19,7 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbProviders", "DbProviders\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentAPI_Annotations", "FluentAPI\FluentAPI_Annotations.csproj", "{72939BFB-7F22-405F-87BF-3EEDDBF78F9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RelationshipsModels", "RelationshipsModels\RelationshipsModels.csproj", "{19131311-E895-4FE8-A208-202F582A6749}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RelationshipsModels", "RelationshipsModels\RelationshipsModels.csproj", "{19131311-E895-4FE8-A208-202F582A6749}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transaction", "Transaction\Transaction.csproj", "{3BBDCA6D-C1B7-4C99-81EB-BD97D57AB768}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parallelism", "Parallelism\Parallelism.csproj", "{0357DADB-D85B-4342-825D-46C61E290F20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EF_and_SQL", "EF_and_SQL\EF_and_SQL.csproj", "{FC09F4F7-B5F8-40AE-8E49-8508F61ABC9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +69,18 @@ Global
 		{19131311-E895-4FE8-A208-202F582A6749}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19131311-E895-4FE8-A208-202F582A6749}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19131311-E895-4FE8-A208-202F582A6749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BBDCA6D-C1B7-4C99-81EB-BD97D57AB768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BBDCA6D-C1B7-4C99-81EB-BD97D57AB768}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BBDCA6D-C1B7-4C99-81EB-BD97D57AB768}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BBDCA6D-C1B7-4C99-81EB-BD97D57AB768}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0357DADB-D85B-4342-825D-46C61E290F20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0357DADB-D85B-4342-825D-46C61E290F20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0357DADB-D85B-4342-825D-46C61E290F20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0357DADB-D85B-4342-825D-46C61E290F20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC09F4F7-B5F8-40AE-8E49-8508F61ABC9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC09F4F7-B5F8-40AE-8E49-8508F61ABC9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC09F4F7-B5F8-40AE-8E49-8508F61ABC9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC09F4F7-B5F8-40AE-8E49-8508F61ABC9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
